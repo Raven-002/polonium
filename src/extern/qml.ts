@@ -59,6 +59,7 @@ export interface Shortcuts {
     getRotateLayout(): ShortcutHandler;
 
     getCycleEngine(): ShortcutHandler;
+    getRestartEngine(): ShortcutHandler;
     getSwitchBTree(): ShortcutHandler;
     getSwitchHalf(): ShortcutHandler;
     getSwitchThreeColumn(): ShortcutHandler;

@@ -167,6 +167,9 @@ export class ShortcutManager {
         shortcuts
             .getCycleEngine()
             .activated.connect(this.cycleEngine.bind(this));
+        shortcuts
+            .getRestartEngine()
+            .activated.connect(this.restartEngine.bind(this));
 
         shortcuts
             .getSwitchBTree()
@@ -350,5 +353,28 @@ export class ShortcutManager {
         engineConfig.rotateLayout = !engineConfig.rotateLayout;
         this.ctrl.qmlObjects.osd.show("Rotate Layout: " + engineConfig.rotateLayout);
         this.ctrl.driverManager.setEngineConfig(desktop, engineConfig);
+    }
+
+    restartEngine(): void {
+        const desktop = this.ctrl.desktopFactory.createDefaultDesktop();
+        const engineConfig = this.ctrl.driverManager.getEngineConfig(desktop);
+        let engineType = engineConfig.engineType;
+        if (EngineType.BTree == engineType) {
+            engineConfig.engineType = EngineType.Half;
+        } else {
+            engineConfig.engineType = EngineType.BTree;
+        }
+        this.ctrl.driverManager.setEngineConfig(desktop, engineConfig);
+        engineConfig.engineType = engineType;
+        this.ctrl.driverManager.setEngineConfig(desktop, engineConfig);
+        this.ctrl.qmlObjects.osd.show("Restart: " + engineName(engineType));
+        this.ctrl.workspace.windows.forEach(window => {
+            if (this.ctrl.windowExtensions.get(window)!.isTiled) {
+                this.ctrl.driverManager.untileWindow(window);
+                this.ctrl.driverManager.rebuildLayout();
+                this.ctrl.driverManager.addWindowToPosition(window, null);
+                this.ctrl.driverManager.rebuildLayout();
+            }
+        });
     }
 }
